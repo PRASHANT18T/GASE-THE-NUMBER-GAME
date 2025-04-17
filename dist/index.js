@@ -2,6 +2,8 @@
 let secretNumber = Math.floor(Math.random() * 25) + 1; // Secret number between 1 and 25
 let selectedNumber = null;
 let score = 0;
+let attempts = 5;
+let attempt = 0;
 
 // DOM Elements
 const numberButtons = document.querySelectorAll(".number-button");
@@ -16,8 +18,7 @@ function updateSelectedNumber(num) {
   selectedNumber = num;
   selectedNumberDisplay.textContent = num;
   feedbackText.textContent = "--"; // Reset feedback when a new number is selected
-  // Remove any celebration animation
-    selectedNumberDisplay.classList.remove("animate-bounce");
+  selectedNumberDisplay.classList.remove("animate-bounce"); // Remove any celebration animation
 }
 
 // Add click event listeners to all number buttons
@@ -28,38 +29,53 @@ numberButtons.forEach(button => {
   });
 });
 
-
-
 // Check Button Event Listener
 checkButton.addEventListener("click", () => {
   if (selectedNumber === null) {
     feedbackText.textContent = "Select a number first!";
     return;
   }
+
+  if (attempt >= attempts) {
+    alert("No more attempts left!");
+    restartGame();
+    return;
+  }
+
   if (selectedNumber === secretNumber) {
     feedbackText.textContent = "CORRECT!";
-    // Celebrate with a bounce animation
     selectedNumberDisplay.classList.add("animate-bounce");
-    // Increase score
     score++;
     scoreDisplay.textContent = score.toString().padStart(2, "0");
+    attempt = 0; // Reset attempts on correct guess
+    secretNumber = Math.floor(Math.random() * 25) + 1; // New secret number after correct guess
+    console.log("New Secret Number:", secretNumber);
   } else if (selectedNumber > secretNumber) {
     feedbackText.textContent = "TOO HIGH";
+    attempt++;
   } else if (selectedNumber < secretNumber) {
     feedbackText.textContent = "TOO LOW";
+    attempt++;
   }
+
+  // Optional: Log remaining attempts
+  console.log(`Attempts: ${attempt} / ${attempts}`);
 });
+
+// Restart Game Function
+function restartGame() {
+  secretNumber = Math.floor(Math.random() * 25) + 1;
+  selectedNumber = null;
+  attempt = 0;
+  score = 0;
+  selectedNumberDisplay.textContent = "--";
+  feedbackText.textContent = "--";
+  scoreDisplay.textContent = "00";
+  selectedNumberDisplay.classList.remove("animate-bounce");
+  console.log("Game restarted. New Secret Number:", secretNumber);
+}
 
 // Play Again Button Event Listener
 playAgainButton.addEventListener("click", () => {
-  // Reset game state
-  secretNumber = Math.floor(Math.random() * 25) + 1;
-  selectedNumber = null;
-  selectedNumberDisplay.textContent = "--";
-  feedbackText.textContent = "--";
-  // Remove animation if any
-  selectedNumberDisplay.classList.remove("animate-bounce");
-  // Optionally, reset score or keep it
-   score = 0; scoreDisplay.textContent = "00";
-  console.log("New Secret Number:", secretNumber);
+  restartGame();
 });
